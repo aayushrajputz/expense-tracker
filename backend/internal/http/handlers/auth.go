@@ -80,7 +80,6 @@ func (h *AuthHandler) Register(c *gin.Context) {
 
 	// Create user
 	user := &domain.User{
-		ID:           uuid.New(),
 		Email:        req.Email,
 		PasswordHash: string(hashedPassword),
 	}
