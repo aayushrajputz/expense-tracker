@@ -13,7 +13,7 @@ import (
 type User struct {
 	ID           uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	Email        string         `gorm:"uniqueIndex;not null" json:"email"`
-	PasswordHash string         `gorm:"not null" json:"-"`
+	PasswordHash string         `gorm:"column:password_hash;not null" json:"-"`
 	CreatedAt    time.Time      `gorm:"default:now()" json:"created_at"`
 	UpdatedAt    time.Time      `gorm:"default:now()" json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
