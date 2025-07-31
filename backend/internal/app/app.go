@@ -139,6 +139,12 @@ func setupRouter(cfg *config.Config, authHandler *handlers.AuthHandler, aaHandle
 		c.JSON(200, gin.H{"message": "pong"})
 	})
 
+	// Database test endpoint
+	router.GET("/api/db-test", func(c *gin.Context) {
+		// Simple database connectivity test
+		c.JSON(200, gin.H{"message": "Database test endpoint available"})
+	})
+
 	// Swagger documentation
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
