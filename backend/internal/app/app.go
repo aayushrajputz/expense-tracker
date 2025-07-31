@@ -145,12 +145,10 @@ func setupRouter(cfg *config.Config, authHandler *handlers.AuthHandler, aaHandle
 	// API routes
 	api := router.Group("/api")
 	{
-		// Auth routes (public)
-		auth := api.Group("/auth")
-		{
-			auth.POST("/register", authHandler.Register)
-			auth.POST("/login", authHandler.Login)
-		}
+		// Auth routes (public) - match frontend expectations
+		api.POST("/register", authHandler.Register)
+		api.POST("/signup", authHandler.Register) // Alias for register
+		api.POST("/login", authHandler.Login)
 
 		// AA routes
 		aa := api.Group("/aa")
