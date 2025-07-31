@@ -13,6 +13,7 @@ import (
 	"github.com/your-github/expense-tracker-backend/internal/app"
 	"github.com/your-github/expense-tracker-backend/internal/repo"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -34,10 +35,19 @@ func main() {
 		logger.Fatal("Failed to load configuration", zap.Error(err))
 	}
 
-	// Initialize database
-	db, err := repo.NewDB(cfg.Database.DSN)
+	// Initialize database with retry logic
+	var db *gorm.DB
+	maxRetries := 5
+	for i := 0; i < maxRetries; i++ {
+		db, err = repo.NewDB(cfg.Database.DSN)
+		if err == nil {
+			break
+		}
+		logger.Warn("Failed to connect to database, retrying...", zap.Error(err), zap.Int("attempt", i+1))
+		time.Sleep(time.Duration(i+1) * time.Second)
+	}
 	if err != nil {
-		logger.Fatal("Failed to connect to database", zap.Error(err))
+		logger.Fatal("Failed to connect to database after retries", zap.Error(err))
 	}
 	defer func() {
 		if err := repo.Close(db); err != nil {
@@ -45,9 +55,16 @@ func main() {
 		}
 	}()
 
-	// Run migrations
-	if err := repo.RunMigrations(cfg.Database.DSN); err != nil {
-		logger.Fatal("Failed to run migrations", zap.Error(err))
+	// Run migrations with retry logic
+	for i := 0; i < maxRetries; i++ {
+		if err := repo.RunMigrations(cfg.Database.DSN); err == nil {
+			break
+		}
+		logger.Warn("Failed to run migrations, retrying...", zap.Error(err), zap.Int("attempt", i+1))
+		time.Sleep(time.Duration(i+1) * time.Second)
+	}
+	if err != nil {
+		logger.Fatal("Failed to run migrations after retries", zap.Error(err))
 	}
 
 	// Initialize repositories
@@ -58,6 +75,7 @@ func main() {
 
 	// Start the server
 	go func() {
+		logger.Info("Attempting to start server...")
 		if err := application.Start(); err != nil {
 			logger.Fatal("Failed to start server", zap.Error(err))
 		}

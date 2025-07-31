@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -90,6 +91,11 @@ func setDefaults() {
 	// App defaults
 	viper.SetDefault("app.port", "8080")
 	viper.SetDefault("app.env", "development")
+
+	// Ensure PORT environment variable is used if available
+	if port := os.Getenv("PORT"); port != "" {
+		viper.SetDefault("app.port", port)
+	}
 
 	// Database defaults
 	viper.SetDefault("database.dsn", "postgres://postgres:postgres@localhost:5432/expensedb?sslmode=disable")

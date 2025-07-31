@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -31,6 +32,7 @@ type App struct {
 
 // NewApp creates a new application instance
 func NewApp(cfg *config.Config, repositories *repo.Repositories, logger *zap.Logger) *App {
+	logger.Info("Initializing application...")
 	// Initialize services
 	normalizer := services.NewNormalizer()
 	deduplicator := services.NewDeduplicator()
@@ -46,12 +48,14 @@ func NewApp(cfg *config.Config, repositories *repo.Repositories, logger *zap.Log
 	aaHandler := handlers.NewAAHandler(aaService, repositories, cfg, logger)
 
 	// Setup router
+	logger.Info("Setting up router...")
 	router := setupRouter(cfg, authHandler, aaHandler, logger)
 
 	// Setup cron jobs
+	logger.Info("Setting up cron jobs...")
 	cronJobs := setupCronJobs(aaService, logger)
 
-	return &App{
+	app := &App{
 		config:       cfg,
 		repositories: repositories,
 		aaService:    aaService,
@@ -59,6 +63,9 @@ func NewApp(cfg *config.Config, repositories *repo.Repositories, logger *zap.Log
 		cron:         cronJobs,
 		logger:       logger,
 	}
+
+	logger.Info("Application initialized successfully")
+	return app
 }
 
 // Start starts the application
@@ -67,16 +74,25 @@ func (a *App) Start() error {
 	a.cron.Start()
 	a.logger.Info("Cron jobs started")
 
+	// Get port from environment variable or config
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = a.config.App.Port
+	}
+	if port == "" {
+		port = "8080" // Final fallback
+	}
+
 	// Create HTTP server
 	a.server = &http.Server{
-		Addr:         ":" + a.config.App.Port,
+		Addr:         ":" + port,
 		Handler:      a.router,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
 
-	a.logger.Info("Starting server", zap.String("port", a.config.App.Port))
+	a.logger.Info("Starting server", zap.String("port", port), zap.String("address", ":"+port))
 	return a.server.ListenAndServe()
 }
 
@@ -116,6 +132,11 @@ func setupRouter(cfg *config.Config, authHandler *handlers.AuthHandler, aaHandle
 	// Health check
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok", "timestamp": time.Now().Unix()})
+	})
+
+	// Simple ping endpoint for basic connectivity
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "pong"})
 	})
 
 	// Swagger documentation
