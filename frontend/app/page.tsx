@@ -162,7 +162,7 @@ export default function DashboardPage() {
     })
     .slice(0, 5);
 
-  const handleDeleteExpense = async (id) => {
+  const handleDeleteExpense = async (id: string) => {
     if (!confirm('Are you sure you want to delete this transaction?')) {
       return;
     }
@@ -194,7 +194,7 @@ export default function DashboardPage() {
       console.error('Failed to delete transaction:', error);
       
       // If it's a network error (backend not running), still remove from local state
-      if (error.message && error.message.includes('Backend server is not running')) {
+      if (error instanceof Error && error.message && error.message.includes('Backend server is not running')) {
         // Remove the expense from the local state even if backend is not available
         setExpenses(prevExpenses => {
           const updatedExpenses = prevExpenses.filter(expense => expense.id !== id);

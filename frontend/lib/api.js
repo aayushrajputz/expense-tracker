@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { expenseCache, summaryCache, userCache, cacheUtils } from './cache.js';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://expense-tracker-tzun.onrender.com';
 
 // Request deduplication map
 const pendingRequests = new Map();

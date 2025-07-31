@@ -37,18 +37,18 @@ export default function AIPage() {
       
       // Calculate totals and categories
       const incomeTotal = expenses
-        .filter(exp => exp.type === 'income')
-        .reduce((sum, exp) => sum + exp.amount, 0);
+        .filter((exp: any) => exp.type === 'income')
+        .reduce((sum: number, exp: any) => sum + exp.amount, 0);
       
       const expenseTotal = expenses
-        .filter(exp => exp.type === 'expense')
-        .reduce((sum, exp) => sum + exp.amount, 0);
+        .filter((exp: any) => exp.type === 'expense')
+        .reduce((sum: number, exp: any) => sum + exp.amount, 0);
       
       // Group by categories
       const categoryMap = new Map();
       expenses
-        .filter(exp => exp.type === 'expense')
-        .forEach(exp => {
+        .filter((exp: any) => exp.type === 'expense')
+        .forEach((exp: any) => {
           const category = exp.category || 'Other';
           categoryMap.set(category, (categoryMap.get(category) || 0) + exp.amount);
         });
@@ -198,7 +198,7 @@ export default function AIPage() {
               </button>
             </div>
 
-            {error && <ErrorMessage message={error} />}
+            {error && <ErrorMessage message={error} onRetry={() => fetchInsights(true)} />}
 
             {insights && <InsightsCards insights={insights} />}
           </div>

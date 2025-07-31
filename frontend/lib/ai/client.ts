@@ -231,11 +231,14 @@ const generateRealAIInsights = (financialData: any) => {
   
   // AI weekly trend analysis
   if (weeklySeries && weeklySeries.length > 0) {
-    const weeklyAverages = weeklySeries.reduce((acc, week) => {
-      acc.income += week.income;
-      acc.expense += week.expense;
-      return acc;
-    }, { income: 0, expense: 0 });
+    const weeklyAverages = weeklySeries.reduce(
+      (acc: { income: number; expense: number }, week: { income: number; expense: number }) => {
+        acc.income += week.income;
+        acc.expense += week.expense;
+        return acc;
+      },
+      { income: 0, expense: 0 }
+    );
     
     weeklyAverages.income /= weeklySeries.length;
     weeklyAverages.expense /= weeklySeries.length;
