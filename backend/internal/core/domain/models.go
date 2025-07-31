@@ -11,69 +11,89 @@ import (
 
 // User represents a user in the system
 type User struct {
-	ID           uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	Email        string    `gorm:"uniqueIndex;not null" json:"email"`
-	PasswordHash string    `gorm:"not null" json:"-"`
-	CreatedAt    time.Time `gorm:"default:now()" json:"created_at"`
-	UpdatedAt    time.Time `gorm:"default:now()" json:"updated_at"`
+	ID           uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Email        string         `gorm:"uniqueIndex;not null" json:"email"`
+	PasswordHash string         `gorm:"not null" json:"-"`
+	CreatedAt    time.Time      `gorm:"default:now()" json:"created_at"`
+	UpdatedAt    time.Time      `gorm:"default:now()" json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+// TableName specifies the table name for User
+func (User) TableName() string {
+	return "users"
 }
 
 // BankLink represents a user's bank account link via AA
 type BankLink struct {
-	ID           uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	UserID       uuid.UUID `gorm:"type:uuid;not null;index" json:"user_id"`
-	AAConsentID  string    `gorm:"not null;index" json:"aa_consent_id"`
-	FIType       string    `gorm:"not null" json:"fi_type"` // "SAVINGS", "CURRENT", etc.
-	Status       string    `gorm:"not null;index" json:"status"` // "PENDING", "ACTIVE", "REVOKED"
-	ValidTill    *time.Time `json:"valid_till"`
-	CreatedAt    time.Time `gorm:"default:now()" json:"created_at"`
-	UpdatedAt    time.Time `gorm:"default:now()" json:"updated_at"`
-	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	ID          uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	UserID      uuid.UUID      `gorm:"type:uuid;not null;index" json:"user_id"`
+	AAConsentID string         `gorm:"not null;index" json:"aa_consent_id"`
+	FIType      string         `gorm:"not null" json:"fi_type"`      // "SAVINGS", "CURRENT", etc.
+	Status      string         `gorm:"not null;index" json:"status"` // "PENDING", "ACTIVE", "REVOKED"
+	ValidTill   *time.Time     `json:"valid_till"`
+	CreatedAt   time.Time      `gorm:"default:now()" json:"created_at"`
+	UpdatedAt   time.Time      `gorm:"default:now()" json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
-	User         User           `gorm:"foreignKey:UserID" json:"user,omitempty"`
-	Transactions []Transaction  `gorm:"foreignKey:BankLinkID" json:"transactions,omitempty"`
+	User         User          `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Transactions []Transaction `gorm:"foreignKey:BankLinkID" json:"transactions,omitempty"`
+}
+
+// TableName specifies the table name for BankLink
+func (BankLink) TableName() string {
+	return "bank_links"
 }
 
 // Transaction represents a bank transaction
 type Transaction struct {
-	ID            uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	UserID        uuid.UUID `gorm:"type:uuid;not null;index" json:"user_id"`
-	BankLinkID    *uuid.UUID `gorm:"type:uuid;index" json:"bank_link_id"`
-	PostedAt      time.Time `gorm:"not null;index" json:"posted_at"`
-	ValueDate     *time.Time `json:"value_date"`
-	Amount        float64   `gorm:"type:numeric(14,2);not null" json:"amount"`
-	Currency      string    `gorm:"default:'INR'" json:"currency"`
-	TxnType       string    `gorm:"not null;index" json:"txn_type"` // "DEBIT" | "CREDIT"
-	BalanceAfter  *float64  `gorm:"type:numeric(14,2)" json:"balance_after"`
-	DescriptionRaw string   `json:"description_raw"`
-	MerchantName  string    `json:"merchant_name"`
-	AccountRef    string    `json:"account_ref"` // masked account / VPA
-	Category      string    `json:"category"`
-	Subcategory   string    `json:"subcategory"`
-	HashDedupe    string    `gorm:"uniqueIndex;not null" json:"hash_dedupe"`
-	SourceMeta    JSONB     `gorm:"type:jsonb;default:'{}'::jsonb" json:"source_meta"`
-	CreatedAt     time.Time `gorm:"default:now()" json:"created_at"`
-	UpdatedAt     time.Time `gorm:"default:now()" json:"updated_at"`
-	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
+	ID             uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	UserID         uuid.UUID      `gorm:"type:uuid;not null;index" json:"user_id"`
+	BankLinkID     *uuid.UUID     `gorm:"type:uuid;index" json:"bank_link_id"`
+	PostedAt       time.Time      `gorm:"not null;index" json:"posted_at"`
+	ValueDate      *time.Time     `json:"value_date"`
+	Amount         float64        `gorm:"type:numeric(14,2);not null" json:"amount"`
+	Currency       string         `gorm:"default:'INR'" json:"currency"`
+	TxnType        string         `gorm:"not null;index" json:"txn_type"` // "DEBIT" | "CREDIT"
+	BalanceAfter   *float64       `gorm:"type:numeric(14,2)" json:"balance_after"`
+	DescriptionRaw string         `json:"description_raw"`
+	MerchantName   string         `json:"merchant_name"`
+	AccountRef     string         `json:"account_ref"` // masked account / VPA
+	Category       string         `json:"category"`
+	Subcategory    string         `json:"subcategory"`
+	HashDedupe     string         `gorm:"uniqueIndex;not null" json:"hash_dedupe"`
+	SourceMeta     JSONB          `gorm:"type:jsonb;default:'{}'::jsonb" json:"source_meta"`
+	CreatedAt      time.Time      `gorm:"default:now()" json:"created_at"`
+	UpdatedAt      time.Time      `gorm:"default:now()" json:"updated_at"`
+	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
-	User      User      `gorm:"foreignKey:UserID" json:"user,omitempty"`
-	BankLink  *BankLink `gorm:"foreignKey:BankLinkID" json:"bank_link,omitempty"`
+	User     User      `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	BankLink *BankLink `gorm:"foreignKey:BankLinkID" json:"bank_link,omitempty"`
+}
+
+// TableName specifies the table name for Transaction
+func (Transaction) TableName() string {
+	return "transactions"
 }
 
 // CategoryOverride represents user-defined category rules
 type CategoryOverride struct {
-	ID         uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	UserID     uuid.UUID `gorm:"type:uuid;not null;index" json:"user_id"`
-	Matcher    string    `gorm:"not null" json:"matcher"` // regex or contains
-	Category   string    `gorm:"not null" json:"category"`
-	Subcategory string  `json:"subcategory"`
-	CreatedAt  time.Time `gorm:"default:now()" json:"created_at"`
+	ID          uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	UserID      uuid.UUID `gorm:"type:uuid;not null;index" json:"user_id"`
+	Matcher     string    `gorm:"not null" json:"matcher"` // regex or contains
+	Category    string    `gorm:"not null" json:"category"`
+	Subcategory string    `json:"subcategory"`
+	CreatedAt   time.Time `gorm:"default:now()" json:"created_at"`
 
 	// Relationships
 	User User `gorm:"foreignKey:UserID" json:"user,omitempty"`
+}
+
+// TableName specifies the table name for CategoryOverride
+func (CategoryOverride) TableName() string {
+	return "category_overrides"
 }
 
 // JSONB is a custom type for PostgreSQL JSONB
@@ -90,7 +110,7 @@ func (j *JSONB) Scan(value interface{}) error {
 		*j = nil
 		return nil
 	}
-	
+
 	switch v := value.(type) {
 	case []byte:
 		return json.Unmarshal(v, j)
@@ -115,4 +135,4 @@ func (j *JSONB) UnmarshalJSON(data []byte) error {
 		*j = make(JSONB)
 	}
 	return json.Unmarshal(data, (*map[string]interface{})(j))
-} 
+}
