@@ -41,11 +41,8 @@ COPY --from=builder /app/main .
 # Copy migrations
 COPY --from=builder /app/migrations ./migrations
 
-# Copy startup script
-COPY --from=builder /app/start.sh ./start.sh
-
 # Change ownership to non-root user
-RUN chown -R appuser:appgroup /app && chmod +x start.sh
+RUN chown -R appuser:appgroup /app
 
 # Switch to non-root user
 USER appuser
@@ -57,5 +54,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || wget --no-verbose --tries=1 --spider http://localhost:8080/ping || exit 1
 
-# Run the application
-CMD ["./start.sh"] 
+# Run the application directly
+CMD ["./main"] 
