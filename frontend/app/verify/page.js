@@ -89,6 +89,7 @@ export default function VerifyPage() {
                 type="text"
                 required
                 maxLength="6"
+                autoComplete="one-time-code"
                 className="appearance-none rounded-2xl relative block w-full px-6 py-4 bg-[#0d0d0d]/60 border-2 border-[#333333] placeholder-[#808080] text-white focus:outline-none focus:ring-2 focus:ring-[#00FFFF] focus:border-[#00FFFF] transition-all duration-300 text-lg shadow-inner hover:border-[#FFD700]/50 text-center tracking-widest"
                 placeholder="Enter 6-digit code"
                 value={otp}

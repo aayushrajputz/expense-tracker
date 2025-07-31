@@ -82,6 +82,7 @@ export default function SignupPage() {
                 name="name"
                 type="text"
                 required
+                autoComplete="name"
                 className="appearance-none rounded-2xl relative block w-full px-6 py-4 bg-[#0d0d0d]/60 border-2 border-[#333333] placeholder-[#808080] text-white focus:outline-none focus:ring-2 focus:ring-[#00FFFF] focus:border-[#00FFFF] transition-all duration-300 text-lg shadow-inner hover:border-[#FFD700]/50"
                 placeholder="Enter your full name"
                 value={name}
@@ -97,6 +98,7 @@ export default function SignupPage() {
                 name="email"
                 type="email"
                 required
+                autoComplete="email"
                 className="appearance-none rounded-2xl relative block w-full px-6 py-4 bg-[#0d0d0d]/60 border-2 border-[#333333] placeholder-[#808080] text-white focus:outline-none focus:ring-2 focus:ring-[#00FFFF] focus:border-[#00FFFF] transition-all duration-300 text-lg shadow-inner hover:border-[#FFD700]/50"
                 placeholder="Enter your email address"
                 value={email}
@@ -112,6 +114,7 @@ export default function SignupPage() {
                 name="password"
                 type="password"
                 required
+                autoComplete="new-password"
                 className="appearance-none rounded-2xl relative block w-full px-6 py-4 bg-[#0d0d0d]/60 border-2 border-[#333333] placeholder-[#808080] text-white focus:outline-none focus:ring-2 focus:ring-[#00FFFF] focus:border-[#00FFFF] transition-all duration-300 text-lg shadow-inner hover:border-[#FFD700]/50"
                 placeholder="Create a secure password"
                 value={password}
@@ -127,6 +130,7 @@ export default function SignupPage() {
                 name="confirmPassword"
                 type="password"
                 required
+                autoComplete="new-password"
                 className="appearance-none rounded-2xl relative block w-full px-6 py-4 bg-[#0d0d0d]/60 border-2 border-[#333333] placeholder-[#808080] text-white focus:outline-none focus:ring-2 focus:ring-[#00FFFF] focus:border-[#00FFFF] transition-all duration-300 text-lg shadow-inner hover:border-[#FFD700]/50"
                 placeholder="Confirm your password"
                 value={confirmPassword}
