@@ -71,7 +71,7 @@ jobs:
     - name: Build application
       run: |
         cd backend
-        go build -o expense-tracker-api .
+        go build -o expense-tracker-api ./cmd/server
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -126,7 +126,7 @@ jobs:
     - name: Build for production
       run: |
         cd backend
-        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o expense-tracker-api .
+        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o expense-tracker-api ./cmd/server
         
     # Add deployment steps here based on your hosting platform
     # Example for AWS ECS:
