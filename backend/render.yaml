@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: expense-tracker-backend
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: APP_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DB_DSN
+        sync: false
+      - key: AA_BASE_URL
+        value: https://sandbox.example-aa.com
+      - key: AA_PROVIDER
+        value: mock
+      - key: WEBHOOK_SECRET
+        generateValue: true
+    healthCheckPath: /health
+    autoDeploy: true 

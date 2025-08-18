@@ -1,0 +1,22 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.min.css');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fix white background on scroll */
+html, body {
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-attachment: fixed;
+}
+
+/* Ensure all pages have dark background */
+#__next {
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%);
+  min-height: 100vh;
+}

@@ -1,0 +1,106 @@
+name: Full Stack Deploy
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+jobs:
+  frontend-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm install
+        
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+      env:
+        NODE_ENV: production
+        NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'https://expense-tracker-tzun.onrender.com' }}
+        
+    - name: Deploy Frontend to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        working-directory: ./frontend
+        vercel-args: '--prod'
+      continue-on-error: true
+
+  backend-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23'
+        
+    - name: Build backend
+      run: |
+        cd backend
+        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o expense-tracker-api .
+        
+    - name: Deploy Backend to Render
+      run: |
+        curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+          -H "Authorization: Bearer ${{ secrets.RENDER_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{"clearCache": "do_not_clear"}'
+      continue-on-error: true
+
+  notify:
+    needs: [frontend-deploy, backend-deploy]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Notify on success
+      if: needs.frontend-deploy.result == 'success' && needs.backend-deploy.result == 'success'
+      run: |
+        echo "✅ Full stack deployment completed successfully!"
+        echo "Frontend: ${{ needs.frontend-deploy.outputs.url || 'Deployed to Vercel' }}"
+        echo "Backend: ${{ needs.backend-deploy.outputs.url || 'Deployed to Render' }}"
+        
+    - name: Notify on failure
+      if: needs.frontend-deploy.result == 'failure' || needs.backend-deploy.result == 'failure'
+      run: |
+        echo "❌ Deployment failed!"
+        echo "Frontend status: ${{ needs.frontend-deploy.result }}"
+        echo "Backend status: ${{ needs.backend-deploy.result }}"
+        
+    # Optional: Send notification to Slack/Discord
+    # - name: Send Slack notification
+    #   uses: 8398a7/action-slack@v3
+    #   with:
+    #     status: ${{ job.status }}
+    #     channel: '#deployments'
+    #     webhook_url: ${{ secrets.SLACK_WEBHOOK }} 

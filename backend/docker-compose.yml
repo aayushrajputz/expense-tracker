@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - APP_PORT=8080
+      - APP_ENV=development
+      - DB_DSN=postgres://postgres:postgres@db:5432/expensedb?sslmode=disable
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - AA_BASE_URL=https://sandbox.example-aa.com
+      - AA_API_KEY=your-api-key
+      - AA_CLIENT_ID=your-client-id
+      - AA_CLIENT_SECRET=your-client-secret
+      - AA_PROVIDER=mock
+      - WEBHOOK_SECRET=your-webhook-secret
+    depends_on:
+      - db
+    volumes:
+      - ./migrations:/app/migrations
+    restart: unless-stopped
+    networks:
+      - expense-tracker-network
+
+  db:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_DB=expensedb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - expense-tracker-network
+
+  # Optional: Redis for caching (uncomment when needed)
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   restart: unless-stopped
+  #   networks:
+  #     - expense-tracker-network
+
+volumes:
+  postgres_data:
+  # redis_data:
+
+networks:
+  expense-tracker-network:
+    driver: bridge 
