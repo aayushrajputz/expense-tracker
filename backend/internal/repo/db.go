@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/golang-migrate/migrate/v4"
+	migrate "github.com/golang-migrate/migrate/v4"
 	migratepostgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	gormpostgres "gorm.io/driver/postgres"

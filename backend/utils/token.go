@@ -3,7 +3,7 @@ package utils
 import (
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
+	jwt "github.com/golang-jwt/jwt/v5"
 )
 
 type Claims struct {

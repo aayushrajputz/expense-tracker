@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	"gopkg.in/mail.v2"
+	mail "gopkg.in/mail.v2"
 )
 
 type EmailService struct {
